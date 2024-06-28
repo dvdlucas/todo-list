@@ -1,0 +1,30 @@
+<div class="book-page">
+    <h1>Tarefa</h1>
+    <a href="/tasks" class="back-button">Voltar</a>
+    <div class="container">
+        <h1>{{task.title}}</h1>
+        <p>Esta tarefa consiste em {{task.description}}</p>
+        <p>Prioridade : {{task.priority}}</p>
+        <p>Status : {{task.finish}}</p>
+        <button class="btn"><a href="/tasks/edit/{{task.id}}">Editar</a></button>
+        <a class="btn-finish" href="/tasks/finish/{{task.id}}"
+            onclick="event.preventDefault(); finishTask({{task.id}});">Concluir Tarefa</a>
+    </div>
+</div>
+
+<script>
+       function finishTask(id) {
+            fetch(`/tasks/finish/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert("Tarefa Concluida")
+                    window.location.href = '/tasks/finish';
+                })
+                .catch(error => console.error('Error:', error));
+        }
+</script>

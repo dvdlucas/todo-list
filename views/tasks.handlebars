@@ -1,0 +1,96 @@
+<h1>Tarefas Pendentes</h1>
+<div class="books-container">
+    <button  class="btn"><a href="/">Adicionar Tarefas</a></button>
+    <table class="books-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Prioridade</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each tasks}}
+            <tr>
+                <td>{{this.id}}</td>
+                <td>{{this.title}}</td>
+                <td>{{this.description}}</td>
+                <td>{{this.priority}}</td>
+                <td>
+                    <button class="btn"><a href="/task/{{this.id}}">Veja mais</a></button>
+                    <button class="btn-delete" onclick="openModal({{this.id}})">Excluir</button>
+                <a class="btn-finish" href="/tasks/finish/{{this.id}}" onclick="event.preventDefault(); finishTask({{this.id}});">Concluir</a>
+
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <p>Tem certeza que deseja excluir esta tarefa?</p>
+        <button class="btn-confirm" onclick="deleteTask()">Sim</button>
+        <button class="btn-cancel" onclick="closeModal()">Não</button>
+    </div>
+</div>
+
+<script>
+    let taskIdDelete = null;
+
+    function openModal(id) {
+        taskIdDelete = id;
+        document.getElementById("deleteModal").style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("deleteModal").style.display = "none";
+        taskIdDelete = null;
+    }
+
+    function deleteTask() {
+        if (taskIdDelete) {
+            fetch(`/task/delete/${taskIdDelete}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Tarefa excluída com sucesso!');
+                        location.reload();
+                    } else {
+                        alert('Erro ao excluir a tarefa.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao excluir a tarefa.');
+                })
+                .finally(() => {
+                    closeModal();
+                });
+        }
+    }
+
+    function finishTask(id) {
+        fetch(`/tasks/finish/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert("Tarefa Concluida")
+                window.location.href = '/tasks/finish';
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+
+
+</script>

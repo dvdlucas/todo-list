@@ -1,0 +1,16 @@
+<h1>Cadastre uma tarefa: </h1>
+<form action="/tasks/inserttask" method="POST" class="form">
+    <div class="form-control">
+        <label for="title">Tarefa : </label>
+        <input type="text" name="title" placeholder="Digite o nome da Tarefa : ">
+        <div class="form-control">
+        <label for="description">Descrição da Tarefa : </label>
+        <input type="text" name="description" placeholder="Digite uma descrição : ">
+        </div>
+        <div class="form-control">
+            <label for="priority">Prioridade da Tarefa : </label>
+            <input type="text" name="priority" placeholder="Digite a prioridade : ">
+        </div>
+    </div>
+    <input type="submit" value="Cadastrar" class="button">
+</form>

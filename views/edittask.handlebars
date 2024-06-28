@@ -1,0 +1,18 @@
+<h1>Editar livro:</h1>
+<button class="btn"><a href="/tasks">Voltar</a></button>
+<form action="/tasks/updatetask" method="POST" class="form">
+    <input type="hidden" name="id" value="{{task.id}}">
+    <div class="form-control">
+        <label for="title">Tarefa:</label>
+        <input type="text" name="title" value="{{{task.title}}}">
+    </div>
+    <div class="form-control">
+        <label for="description">Descrição:</label>
+        <input type="text" name="description" value="{{task.description}}">
+    </div>
+    <div class="form-control">
+        <label for="priority">Prioridade:</label>
+        <input type="text" name="priority" value="{{task.priority}}">
+    </div>
+    <input type="submit" value="Editar" class="button">
+</form>
