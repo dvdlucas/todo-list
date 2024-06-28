@@ -53,13 +53,6 @@ app.post("/tasks/inserttask", (req, res) => {
   });
 });
 
-const conn = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "tasklist",
-});
-
 app.get("/tasks", (req, res) => {
   const sql = "SELECT * FROM tasks WHERE finish = 0";
 
@@ -184,6 +177,13 @@ app.post("/tasks/updatetask", (req, res) => {
     }
     res.redirect("/tasks");
   });
+});
+
+const conn = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 conn.connect(function (err) {
