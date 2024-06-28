@@ -1,11 +1,11 @@
 const express = require("express");
 const exphbs = require("express-handlebars");
-const mysql = require("mysql");
+const sqlite3 = require("sqlite3").verbose();
+const path = require("path");
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
-
 app.use(express.json());
 
 app.engine(
@@ -43,11 +43,11 @@ app.post("/tasks/inserttask", (req, res) => {
   const priority = req.body.priority;
   const finish = false;
 
-  const sql = `INSERT INTO tasks(title, description, priority, finish) VALUES('${title}', '${description}', '${priority}', '${finish}')`;
+  const sql = `INSERT INTO tasks(title, description, priority, finish) VALUES(?, ?, ?, ?)`;
 
-  conn.query(sql, function (err) {
+  db.run(sql, [title, description, priority, finish], function (err) {
     if (err) {
-      console.log(err);
+      console.error(err.message);
     }
     res.redirect("/tasks");
   });
@@ -56,9 +56,9 @@ app.post("/tasks/inserttask", (req, res) => {
 app.get("/tasks", (req, res) => {
   const sql = "SELECT * FROM tasks WHERE finish = 0";
 
-  conn.query(sql, (err, tasks) => {
+  db.all(sql, [], (err, tasks) => {
     if (err) {
-      console.log(err);
+      console.error(err.message);
       return;
     }
 
@@ -78,12 +78,12 @@ app.get("/tasks", (req, res) => {
 
 app.get("/tasks/finish", (req, res) => {
   const sql = `SELECT * FROM tasks WHERE finish = 1`;
-  conn.query(sql, function (err, data) {
+  db.all(sql, [], (err, tasks) => {
     if (err) {
-      console.log(err);
+      console.error(err.message);
       return;
     }
-    const tasks = data;
+
     tasks.sort((a, b) => {
       const priorityOrder = {
         urgente: 1,
@@ -93,16 +93,18 @@ app.get("/tasks/finish", (req, res) => {
 
       return priorityOrder[a.priority] - priorityOrder[b.priority];
     });
+
     res.render("finish", { tasks });
   });
 });
 
 app.post("/tasks/finish/:id", (req, res) => {
   const id = req.params.id;
-  const sql = `UPDATE tasks SET finish = 1 WHERE id = ${id}`;
-  conn.query(sql, function (err, data) {
+  const sql = `UPDATE tasks SET finish = 1 WHERE id = ?`;
+
+  db.run(sql, [id], function (err) {
     if (err) {
-      console.log(err);
+      console.error(err.message);
       return;
     }
     res.json({ success: true });
@@ -111,10 +113,11 @@ app.post("/tasks/finish/:id", (req, res) => {
 
 app.post("/tasks/refactor/:id", (req, res) => {
   const id = req.params.id;
-  const sql = `UPDATE tasks SET finish = 0 WHERE id = ${id}`;
-  conn.query(sql, function (err, data) {
+  const sql = `UPDATE tasks SET finish = 0 WHERE id = ?`;
+
+  db.run(sql, [id], function (err) {
     if (err) {
-      console.log(err);
+      console.error(err.message);
       return;
     }
     res.json({ success: true });
@@ -124,24 +127,24 @@ app.post("/tasks/refactor/:id", (req, res) => {
 app.get("/task/:id", (req, res) => {
   const id = req.params.id;
 
-  const sql = `SELECT * FROM tasks WHERE id = ${id}`;
-  conn.query(sql, function (err, data) {
+  const sql = `SELECT * FROM tasks WHERE id = ?`;
+
+  db.get(sql, [id], (err, task) => {
     if (err) {
-      console.log(err);
+      console.error(err.message);
       return;
     }
-    const task = data[0];
     res.render("task", { task });
   });
 });
 
 app.delete("/task/delete/:id", (req, res) => {
   const id = req.params.id;
-  const sql = `DELETE FROM tasks WHERE id = ${id}`;
+  const sql = `DELETE FROM tasks WHERE id = ?`;
 
-  conn.query(sql, (err, result) => {
+  db.run(sql, [id], function (err) {
     if (err) {
-      console.error(err);
+      console.error(err.message);
       res.status(500).send("Erro ao excluir a tarefa");
       return;
     }
@@ -152,13 +155,13 @@ app.delete("/task/delete/:id", (req, res) => {
 app.get("/tasks/edit/:id", (req, res) => {
   const id = req.params.id;
 
-  const sql = `SELECT * FROM tasks WHERE id = ${id}`;
-  conn.query(sql, function (err, data) {
+  const sql = `SELECT * FROM tasks WHERE id = ?`;
+
+  db.get(sql, [id], (err, task) => {
     if (err) {
-      console.log(err);
+      console.error(err.message);
       return;
     }
-    const task = data[0];
     res.render("edittask", { task });
   });
 });
@@ -169,27 +172,39 @@ app.post("/tasks/updatetask", (req, res) => {
   const description = req.body.description;
   const priority = req.body.priority;
 
-  const sql = `UPDATE tasks SET title='${title}', description='${description}', priority='${priority}' WHERE id = ${id}`;
+  const sql = `UPDATE tasks SET title = ?, description = ?, priority = ? WHERE id = ?`;
 
-  conn.query(sql, function (err) {
+  db.run(sql, [title, description, priority, id], function (err) {
     if (err) {
-      console.log(err);
+      console.error(err.message);
     }
     res.redirect("/tasks");
   });
 });
 
-const conn = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+const db = new sqlite3.Database(path.join(__dirname, "tasks.db"), (err) => {
+  if (err) {
+    console.error(err.message);
+  }
+  console.log("Conectado ao banco de dados SQLite.");
+
+  db.run(
+    `CREATE TABLE IF NOT EXISTS tasks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      priority TEXT NOT NULL,
+      finish INTEGER
+    )`,
+    (err) => {
+      if (err) {
+        console.error(err.message);
+      }
+      console.log('Tabela "tasks" criada com sucesso');
+    }
+  );
 });
 
-conn.connect(function (err) {
-  if (err) {
-    console.log(err);
-  }
-  console.log("Conectou ao MySQL");
-  app.listen(3000);
+app.listen(3000, () => {
+  console.log("Servidor iniciado na porta 3000");
 });
