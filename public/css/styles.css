@@ -71,8 +71,8 @@ h1 {
     font-weight: bold;
     margin-bottom: 0.5em;
 }
-
-.form-control input {
+ .form-control input[type="text"],
+.form-control select {
     width: calc(100% - 10px);
     padding: 0.5em;
     border: 1px solid #ccc;
@@ -81,7 +81,8 @@ h1 {
 
 /** BOOKS **/
 .books-container {
-    width: 80%;
+    max-width: 80%;
+    overflow-x: auto;
     margin: 0 auto;
 }
 
@@ -93,8 +94,8 @@ h1 {
 .books-table th,
 .books-table td {
     border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
+    padding: 8px;
+    text-align: left;
 }
 
 .books-table th {
@@ -102,9 +103,7 @@ h1 {
     font-weight: bold;
 }
 
-.books-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
+
 
 .btn {
     display: inline-block;
@@ -276,3 +275,15 @@ h1 {
     color: #555;
     line-height: 1.6;
 }
+
+ .priority-leve {
+     background-color: #d4edda;
+ }
+
+ .priority-medio {
+     background-color: #fff3cd;
+ }
+
+ .priority-urgente {
+     background-color: #f8d7da;
+ }

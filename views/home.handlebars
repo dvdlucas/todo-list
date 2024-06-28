@@ -1,16 +1,20 @@
-<h1>Cadastre uma tarefa: </h1>
+<h1>Cadastre uma tarefa:</h1>
 <form action="/tasks/inserttask" method="POST" class="form">
     <div class="form-control">
-        <label for="title">Tarefa : </label>
-        <input type="text" name="title" placeholder="Digite o nome da Tarefa : ">
-        <div class="form-control">
-        <label for="description">Descrição da Tarefa : </label>
-        <input type="text" name="description" placeholder="Digite uma descrição : ">
-        </div>
-        <div class="form-control">
-            <label for="priority">Prioridade da Tarefa : </label>
-            <input type="text" name="priority" placeholder="Digite a prioridade : ">
-        </div>
+        <label for="title">Tarefa:</label>
+        <input type="text" name="title" placeholder="Digite o nome da Tarefa:" required>
+    </div>
+    <div class="form-control">
+        <label for="description">Descrição da Tarefa:</label>
+        <input type="text" name="description" placeholder="Digite uma descrição:" required>
+    </div>
+    <div class="form-control">
+        <label for="priority">Prioridade da Tarefa:</label>
+        <select name="priority" required>
+            <option value="leve">Leve</option>
+            <option value="medio">Médio</option>
+            <option value="urgente">Urgente</option>
+        </select>
     </div>
     <input type="submit" value="Cadastrar" class="button">
 </form>

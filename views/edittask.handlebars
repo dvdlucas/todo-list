@@ -1,18 +1,22 @@
-<h1>Editar livro:</h1>
+<h1>Editar Tarefa:</h1>
 <button class="btn"><a href="/tasks">Voltar</a></button>
 <form action="/tasks/updatetask" method="POST" class="form">
     <input type="hidden" name="id" value="{{task.id}}">
     <div class="form-control">
         <label for="title">Tarefa:</label>
-        <input type="text" name="title" value="{{{task.title}}}">
+        <input type="text" name="title" value="{{task.title}}" required>
     </div>
     <div class="form-control">
         <label for="description">Descrição:</label>
-        <input type="text" name="description" value="{{task.description}}">
+        <input type="text" name="description" value="{{task.description}}" required>
     </div>
     <div class="form-control">
         <label for="priority">Prioridade:</label>
-        <input type="text" name="priority" value="{{task.priority}}">
+        <select name="priority" required>
+            <option value="leve" {{#if (eq task.priority 'leve' )}}selected{{/if}}>Leve</option>
+            <option value="medio" {{#if (eq task.priority 'medio' )}}selected{{/if}}>Médio</option>
+            <option value="urgente" {{#if (eq task.priority 'urgente' )}}selected{{/if}}>Urgente</option>
+        </select>
     </div>
     <input type="submit" value="Editar" class="button">
 </form>

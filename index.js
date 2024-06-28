@@ -1,5 +1,5 @@
 const express = require("express");
-const exps = require("express-handlebars");
+const exphbs = require("express-handlebars");
 const mysql = require("mysql");
 
 const app = express();
@@ -8,7 +8,27 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.json());
 
-app.engine("handlebars", exps.engine());
+app.engine(
+  "handlebars",
+  exphbs.engine({
+    defaultLayout: "main",
+    helpers: {
+      eq: (a, b) => a === b,
+      priorityClass: (priority) => {
+        switch (priority) {
+          case "leve":
+            return "priority-leve";
+          case "medio":
+            return "priority-medio";
+          case "urgente":
+            return "priority-urgente";
+          default:
+            return "";
+        }
+      },
+    },
+  })
+);
 app.set("view engine", "handlebars");
 
 app.use(express.static("public"));
@@ -41,13 +61,24 @@ const conn = mysql.createConnection({
 });
 
 app.get("/tasks", (req, res) => {
-  const sql = `SELECT * FROM tasks WHERE finish = '${0}'`;
-  conn.query(sql, function (err, data) {
+  const sql = "SELECT * FROM tasks WHERE finish = 0";
+
+  conn.query(sql, (err, tasks) => {
     if (err) {
       console.log(err);
       return;
     }
-    const tasks = data;
+
+    tasks.sort((a, b) => {
+      const priorityOrder = {
+        urgente: 1,
+        medio: 2,
+        leve: 3,
+      };
+
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    });
+
     res.render("tasks", { tasks });
   });
 });
@@ -60,6 +91,15 @@ app.get("/tasks/finish", (req, res) => {
       return;
     }
     const tasks = data;
+    tasks.sort((a, b) => {
+      const priorityOrder = {
+        urgente: 1,
+        medio: 2,
+        leve: 3,
+      };
+
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    });
     res.render("finish", { tasks });
   });
 });

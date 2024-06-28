@@ -5,7 +5,12 @@
         <h1>{{task.title}}</h1>
         <p>Esta tarefa consiste em {{task.description}}</p>
         <p>Prioridade : {{task.priority}}</p>
-        <p>Status : {{task.finish}}</p>
+        <p>Status: {{#if (eq task.finish 0)}}
+        Em andamento
+        {{else}}
+        Concluída
+        {{/if}}</p>
+
         <button class="btn"><a href="/tasks/edit/{{task.id}}">Editar</a></button>
         <a class="btn-finish" href="/tasks/finish/{{task.id}}"
             onclick="event.preventDefault(); finishTask({{task.id}});">Concluir Tarefa</a>

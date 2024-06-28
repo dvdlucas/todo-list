@@ -13,7 +13,7 @@
         </thead>
         <tbody>
             {{#each tasks}}
-            <tr>
+            <tr class="{{priorityClass this.priority}}">
                 <td>{{this.id}}</td>
                 <td>{{this.title}}</td>
                 <td>{{this.description}}</td>
